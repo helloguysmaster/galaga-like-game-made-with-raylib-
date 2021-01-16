@@ -13,7 +13,6 @@ typedef struct Entity
     Vector2 pos;
     int health;
     int flashTime;
-    int size; // TODO: Actually implement size!
     bool active;
 } Entity;
 
@@ -50,7 +49,6 @@ void InitGame()
         #define ENEMY_HEALTH 3
         e->health = ENEMY_HEALTH;
         e->flashTime = 0;
-        e->size = 1;
         e->active = false;
         
     }
@@ -73,8 +71,9 @@ int main()
     InitWindow(screenWidth, screenHeight, "Galaga Like Game");
     SetTargetFPS(60);
     Texture2D textureMap = LoadTexture("texturemap.png");
-    //InitAudioDevice();
-    //Sound snd_shoot = LoadSound("shoot.wav");
+    InitAudioDevice();
+    Sound snd_shoot = LoadSound("shoot.wav");
+    SetSoundVolume(snd_shoot, 0.2f);
     
     InitGame();
     
@@ -106,7 +105,7 @@ int main()
             // Shoot bullet
             if (IsKeyPressed(KEY_SPACE))
             {
-                //PlaySound(snd_shoot);
+                PlaySound(snd_shoot);
                 int bulletNumber = 0;
                 for (int i = 0; i < 20; i++) 
                 {
@@ -194,8 +193,6 @@ int main()
                     e->active = true;
                     e->pos = (Vector2){GetRandomValue(10, screenWidth-10), 10};
                     enemiesLeftToSpawn -= 1;
-                    int isNotLarge = GetRandomValue(0, 10/level);
-                    if (isNotLarge == 0)  e->size = 2;
                     if (enemiesLeftToSpawn <= 0)
                     {
                         timeUntilNextEnemySpawns = GetRandomValue(0, GetRandomValue(300, 600)-(level*10));
@@ -232,17 +229,7 @@ int main()
                         Color c;
                         if (e->flashTime > 0)  c = RED; // Makes enemy red when they have just taken damage.
                         else c = WHITE;
-                        
-                        NPatchInfo n;
-                        n.source = (Rectangle){0.0f, 0.0f, 15.0f, 25.0f};
-                        
-                        n.left = 1*e->size;
-                        n.right = 1*e->size;
-                        n.bottom = 1*e->size;
-                        n.top = 1*e->size;
-                        n.type = NPT_9PATCH;
-                        DrawTextureNPatch(textureMap, n, (Rectangle){e->pos.x, e->pos.y, 15.0f, 25.0f}, (Vector2){0.0f}, 1.0f, WHITE);
-                        //DrawTextureRec(textureMap, , e->pos, c);
+                        DrawTextureRec(textureMap, (Rectangle){0.0f, 0.0f, 15.0f, 25.0f}, e->pos, c);
                         if (e->health < ENEMY_HEALTH)  DrawRectangle(e->pos.x-10, e->pos.y-10, e->health*15, 3, GREEN); // TODO: Figure out how to center the healthbar.
                     }
                 }
@@ -255,8 +242,8 @@ int main()
         EndDrawing();
     }
     
-    //UnloadSound(snd_shoot);
-    //CloseAudioDevice();
+    UnloadSound(snd_shoot);
+    CloseAudioDevice();
     UnloadTexture(textureMap);
     CloseWindow();
     return 0;
