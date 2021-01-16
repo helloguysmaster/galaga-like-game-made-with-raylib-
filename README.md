@@ -1,1 +1,1 @@
-# galaga-like-game-made-with-raylib-
+This was made with mingw raylib 3.5 on Windows 10. Just pointing that out because if you want to test this out you might want to just copy the texture and the code and then use your own makefiles in case mine don't work for you because you are using a different/newer version.
